@@ -13,14 +13,11 @@ const Home = () => {
   const [editingTask, setEditingTask] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // Search Filter Sort States
-
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("All");
   const [sort, setSort] = useState("Newest");
 
-  //  FETCH TASKS
-
+  // FETCH TASKS
   const fetchTasks = async () => {
     try {
       setLoading(true);
@@ -28,13 +25,26 @@ const Home = () => {
       const response = await fetch(API);
       const result = await response.json();
 
+      console.log("API Response:", result);
+
       if (!response.ok) {
-        throw new Error(result.message);
+        throw new Error(result.message || "Failed to fetch tasks");
       }
 
-      setTasks(result.data);
+      // Ensure tasks is always an array
+      if (Array.isArray(result)) {
+        setTasks(result);
+      } else if (Array.isArray(result.data)) {
+        setTasks(result.data);
+      } else if (Array.isArray(result.tasks)) {
+        setTasks(result.tasks);
+      } else {
+        setTasks([]);
+      }
     } catch (error) {
+      console.error(error);
       toast.error(error.message || "Unable to fetch tasks");
+      setTasks([]);
     } finally {
       setLoading(false);
     }
@@ -45,7 +55,6 @@ const Home = () => {
   }, []);
 
   // CREATE / UPDATE
-
   const saveTask = async (taskData) => {
     try {
       let response;
@@ -71,27 +80,21 @@ const Home = () => {
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.message);
+        throw new Error(result.message || "Something went wrong");
       }
 
-      toast.success(result.message);
-
-      fetchTasks();
+      toast.success(result.message || "Success");
 
       setEditingTask(null);
+      fetchTasks();
     } catch (error) {
       toast.error(error.message || "Something went wrong");
     }
   };
 
-  //  DELETE
-
+  // DELETE
   const deleteTask = async (id) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this task?",
-    );
-
-    if (!confirmDelete) return;
+    if (!window.confirm("Are you sure you want to delete this task?")) return;
 
     try {
       const response = await fetch(`${API}/${id}`, {
@@ -101,10 +104,10 @@ const Home = () => {
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.message);
+        throw new Error(result.message || "Delete failed");
       }
 
-      toast.success(result.message);
+      toast.success(result.message || "Deleted");
 
       fetchTasks();
     } catch (error) {
@@ -112,8 +115,7 @@ const Home = () => {
     }
   };
 
-  //  EDIT
-
+  // EDIT
   const editTask = (task) => {
     setEditingTask(task);
 
@@ -123,24 +125,17 @@ const Home = () => {
     });
   };
 
-  // SEARCH FILTER SORT
-
+  // SEARCH / FILTER / SORT
   const filteredTasks = useMemo(() => {
-    let updatedTasks = [...tasks];
-
-    // Search
+    let updatedTasks = Array.isArray(tasks) ? [...tasks] : [];
 
     updatedTasks = updatedTasks.filter((task) =>
-      task.title.toLowerCase().includes(search.toLowerCase()),
+      (task.title || "").toLowerCase().includes(search.toLowerCase()),
     );
-
-    // Filter
 
     if (filter !== "All") {
       updatedTasks = updatedTasks.filter((task) => task.status === filter);
     }
-
-    // Sort
 
     switch (sort) {
       case "Newest":
@@ -156,11 +151,15 @@ const Home = () => {
         break;
 
       case "A-Z":
-        updatedTasks.sort((a, b) => a.title.localeCompare(b.title));
+        updatedTasks.sort((a, b) =>
+          (a.title || "").localeCompare(b.title || ""),
+        );
         break;
 
       case "Z-A":
-        updatedTasks.sort((a, b) => b.title.localeCompare(a.title));
+        updatedTasks.sort((a, b) =>
+          (b.title || "").localeCompare(a.title || ""),
+        );
         break;
 
       default:
@@ -172,11 +171,7 @@ const Home = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-5 pt-8 pb-20 min-h-screen">
-      {/* Statistics */}
-
       <Statistics tasks={tasks} />
-
-      {/* Task Form */}
 
       <TaskForm
         saveTask={saveTask}
@@ -184,7 +179,6 @@ const Home = () => {
         setEditingTask={setEditingTask}
       />
 
-      {/* Search Filter */}
       <SearchFilter
         search={search}
         setSearch={setSearch}
@@ -193,8 +187,6 @@ const Home = () => {
         sort={sort}
         setSort={setSort}
       />
-
-      {/* Task List */}
 
       {loading ? (
         <div className="text-center mt-10">
