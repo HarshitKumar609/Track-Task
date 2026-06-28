@@ -1,4 +1,4 @@
-const Statistics = ({ tasks }) => {
+const Statistics = ({ tasks = [] }) => {
   const total = tasks.length;
 
   const pending = tasks.filter((task) => task.status === "Pending").length;

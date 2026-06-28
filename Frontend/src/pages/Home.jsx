@@ -27,11 +27,11 @@ const Home = () => {
       const response = await fetch(API);
       const result = await response.json();
 
-      if (!response.ok) {
-        throw new Error(result.message);
-      }
+      console.log("Result:", result);
+      console.log("Data:", result.data);
+      console.log("Array:", Array.isArray(result.data));
 
-      setTasks(result.data);
+      setTasks(Array.isArray(result.data) ? result.data : []);
     } catch (error) {
       toast.error(error.message || "Unable to fetch tasks");
     } finally {
@@ -125,21 +125,19 @@ const Home = () => {
   // ================= SEARCH FILTER SORT =================
 
   const filteredTasks = useMemo(() => {
+    if (!Array.isArray(tasks)) return [];
+
     let updatedTasks = [...tasks];
 
-    // Search
-
-    updatedTasks = updatedTasks.filter((task) =>
-      task.title.toLowerCase().includes(search.toLowerCase()),
-    );
-
-    // Filter
+    if (search.trim()) {
+      updatedTasks = updatedTasks.filter((task) =>
+        (task.title || "").toLowerCase().includes(search.toLowerCase()),
+      );
+    }
 
     if (filter !== "All") {
       updatedTasks = updatedTasks.filter((task) => task.status === filter);
     }
-
-    // Sort
 
     switch (sort) {
       case "Newest":
@@ -155,11 +153,15 @@ const Home = () => {
         break;
 
       case "A-Z":
-        updatedTasks.sort((a, b) => a.title.localeCompare(b.title));
+        updatedTasks.sort((a, b) =>
+          (a.title || "").localeCompare(b.title || ""),
+        );
         break;
 
       case "Z-A":
-        updatedTasks.sort((a, b) => b.title.localeCompare(a.title));
+        updatedTasks.sort((a, b) =>
+          (b.title || "").localeCompare(a.title || ""),
+        );
         break;
 
       default:
