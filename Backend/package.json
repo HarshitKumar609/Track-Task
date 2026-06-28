@@ -1,0 +1,24 @@
+{
+    "name": "track-task-backend",
+    "version": "1.0.0",
+    "description": "Task Tracker Backend",
+    "type": "module",
+    "main": "index.js",
+    "scripts": {
+        "dev": "nodemon index.js",
+        "start": "node index.js"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "cors": "^2.8.6",
+        "dot-env": "^0.0.1",
+        "dotenv": "^17.4.2",
+        "express": "^5.2.1",
+        "mongoose": "^9.7.3"
+    },
+    "devDependencies": {
+        "nodemon": "^3.1.14"
+    }
+}

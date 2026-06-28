@@ -1,0 +1,68 @@
+
+---
+
+# 🎨 FRONTEND README (React Task Tracker UI)
+
+```md
+# 🚀 Task Tracker Frontend
+
+A modern, responsive Task Tracker UI built using React.js and Tailwind CSS. This frontend connects with a REST API backend to manage tasks efficiently.
+
+---
+
+## 📌 Features
+
+- Add New Tasks
+- Edit Tasks
+- Delete Tasks
+- View Task Statistics
+- Search Tasks
+- Filter by Status
+- Sort Tasks (Newest, Oldest, A-Z, Z-A)
+- Responsive UI (Mobile + Desktop)
+- Real-time updates (without refresh)
+- Clean dashboard UI
+
+---
+
+## 🛠️ Tech Stack
+
+- React.js (Vite)
+- Tailwind CSS
+- React Router DOM
+- React Hot Toast
+- Fetch API
+
+---
+
+## 📂 Project Structure
+
+Frontend/
+│
+├── src/
+│ ├── Components/
+│ │ ├── Navbar.jsx
+│ │ ├── TaskForm.jsx
+│ │ ├── TaskCard.jsx
+│ │ ├── TaskList.jsx
+│ │ ├── Statistics.jsx
+│ │ └── SearchFilter.jsx
+│ │
+│ ├── Pages/
+│ │ └── Home.jsx
+│ │
+│ ├── App.jsx
+│ ├── main.jsx
+│ └── index.css
+│
+└── package.json
+
+
+---
+
+## ⚙️ Installation & Setup
+
+### 1. Install dependencies
+
+```bash
+npm install
