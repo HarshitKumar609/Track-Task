@@ -24,21 +24,31 @@ const Home = () => {
     try {
       setLoading(true);
 
+      console.log("API:", API);
+
       const response = await fetch(API);
+
+      console.log("Status:", response.status);
+      console.log("Content-Type:", response.headers.get("content-type"));
+
       const result = await response.json();
 
-      console.log("Result:", result);
+      console.log("Complete Response:", result);
       console.log("Data:", result.data);
-      console.log("Array:", Array.isArray(result.data));
+      console.log("Is Array:", Array.isArray(result.data));
+
+      if (!response.ok) {
+        throw new Error(result.message || "API Error");
+      }
 
       setTasks(Array.isArray(result.data) ? result.data : []);
     } catch (error) {
-      toast.error(error.message || "Unable to fetch tasks");
+      console.error(error);
+      toast.error(error.message);
     } finally {
       setLoading(false);
     }
   };
-
   useEffect(() => {
     fetchTasks();
   }, []);
