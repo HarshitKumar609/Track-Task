@@ -152,6 +152,12 @@ const Home = () => {
     <div className="max-w-7xl mx-auto px-5 pt-5 pb-20 min-h-screen">
       <Statistics tasks={tasks} />
 
+      <TaskForm
+        saveTask={saveTask}
+        editingTask={editingTask}
+        setEditingTask={setEditingTask}
+      />
+
       <SearchFilter
         search={search}
         setSearch={setSearch}
@@ -159,12 +165,6 @@ const Home = () => {
         setFilter={setFilter}
         sort={sort}
         setSort={setSort}
-      />
-
-      <TaskForm
-        saveTask={saveTask}
-        editingTask={editingTask}
-        setEditingTask={setEditingTask}
       />
 
       {loading ? (
