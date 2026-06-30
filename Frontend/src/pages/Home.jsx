@@ -7,53 +7,38 @@ import TaskForm from "../Components/TaskForm";
 import TaskList from "../Components/TaskList";
 
 const API = import.meta.env.VITE_API_URL;
+
 const Home = () => {
   const [tasks, setTasks] = useState([]);
   const [editingTask, setEditingTask] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // Search Filter Sort States
-
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("All");
   const [sort, setSort] = useState("Newest");
-
-  // ================= FETCH TASKS =================
 
   const fetchTasks = async () => {
     try {
       setLoading(true);
 
-      console.log("API:", API);
-
       const response = await fetch(API);
-
-      console.log("Status:", response.status);
-      console.log("Content-Type:", response.headers.get("content-type"));
-
       const result = await response.json();
 
-      console.log("Complete Response:", result);
-      console.log("Data:", result.data);
-      console.log("Is Array:", Array.isArray(result.data));
-
       if (!response.ok) {
-        throw new Error(result.message || "API Error");
+        throw new Error(result.message || "Unable to fetch tasks");
       }
 
-      setTasks(Array.isArray(result.data) ? result.data : []);
+      setTasks(result.data || []);
     } catch (error) {
-      console.error(error);
       toast.error(error.message);
     } finally {
       setLoading(false);
     }
   };
+
   useEffect(() => {
     fetchTasks();
   }, []);
-
-  // ================= CREATE / UPDATE =================
 
   const saveTask = async (taskData) => {
     try {
@@ -89,18 +74,12 @@ const Home = () => {
 
       setEditingTask(null);
     } catch (error) {
-      toast.error(error.message || "Something went wrong");
+      toast.error(error.message);
     }
   };
 
-  // ================= DELETE =================
-
   const deleteTask = async (id) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this task?",
-    );
-
-    if (!confirmDelete) return;
+    if (!window.confirm("Delete this task?")) return;
 
     try {
       const response = await fetch(`${API}/${id}`, {
@@ -117,11 +96,9 @@ const Home = () => {
 
       fetchTasks();
     } catch (error) {
-      toast.error(error.message || "Delete failed");
+      toast.error(error.message);
     }
   };
-
-  // ================= EDIT =================
 
   const editTask = (task) => {
     setEditingTask(task);
@@ -132,18 +109,12 @@ const Home = () => {
     });
   };
 
-  // ================= SEARCH FILTER SORT =================
-
   const filteredTasks = useMemo(() => {
-    if (!Array.isArray(tasks)) return [];
-
     let updatedTasks = [...tasks];
 
-    if (search.trim()) {
-      updatedTasks = updatedTasks.filter((task) =>
-        (task.title || "").toLowerCase().includes(search.toLowerCase()),
-      );
-    }
+    updatedTasks = updatedTasks.filter((task) =>
+      task.title.toLowerCase().includes(search.toLowerCase()),
+    );
 
     if (filter !== "All") {
       updatedTasks = updatedTasks.filter((task) => task.status === filter);
@@ -163,15 +134,11 @@ const Home = () => {
         break;
 
       case "A-Z":
-        updatedTasks.sort((a, b) =>
-          (a.title || "").localeCompare(b.title || ""),
-        );
+        updatedTasks.sort((a, b) => a.title.localeCompare(b.title));
         break;
 
       case "Z-A":
-        updatedTasks.sort((a, b) =>
-          (b.title || "").localeCompare(a.title || ""),
-        );
+        updatedTasks.sort((a, b) => b.title.localeCompare(a.title));
         break;
 
       default:
@@ -182,12 +149,8 @@ const Home = () => {
   }, [tasks, search, filter, sort]);
 
   return (
-    <div className="max-w-7xl mx-auto px-5 pt-32 pb-20 min-h-screen">
-      {/* Statistics */}
-
+    <div className="max-w-7xl mx-auto px-5 pt-5 pb-20 min-h-screen">
       <Statistics tasks={tasks} />
-
-      {/* Search Filter */}
 
       <SearchFilter
         search={search}
@@ -198,20 +161,14 @@ const Home = () => {
         setSort={setSort}
       />
 
-      {/* Task Form */}
-
       <TaskForm
         saveTask={saveTask}
         editingTask={editingTask}
         setEditingTask={setEditingTask}
       />
 
-      {/* Task List */}
-
       {loading ? (
-        <div className="text-center mt-10">
-          <h2 className="text-2xl font-semibold">Loading Tasks...</h2>
-        </div>
+        <h2 className="text-center text-2xl font-semibold mt-10">Loading...</h2>
       ) : (
         <TaskList
           tasks={filteredTasks}
